@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Speakeasy | vocal programming</title>
+		<link rel="shortcut icon" href="images/Speakeasy-icon-logo.png">
+		<!-- Bootstrap stylesheet-->
+		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+		<!-- Font awsome -->
+		<script src="https://kit.fontawesome.com/cd4610a262.js" crossorigin="anonymous"></script>
+		<!-- Css -->
+		<link rel="stylesheet" href="css/styles.css">
+		<!-- Bootstrap scripts -->
+		<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+		<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+		<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
+
+	</head>
+
+	<body>
+
+		<div class="top-title">
+			<img id="speakeasy-logo" src="images/Speakeasy-logo.png" alt="speak easy logo">
+		</div>
+		<div class="opt-buttons">
+				<button class="btn btn-lg colorbtn" id="startrecognitionbtn" onclick="startConverting()"><i class="fa fa-microphone"></i> Speak</button>
+				<button class="btn btn-lg whitebtn disabled" id="executebtn"><i class="fa fa-cogs"></i> Execute</button>
+				<button class="btn btn-lg whitebtn" id="clearbtn" onclick="cleartext()"><i class="fas fa-trash"></i> Clear text</button>
+				<button class="btn btn-lg whitebtn" id="edittextbtn" onclick="edittext()"><i class="fas fa-edit"></i> Edit text</button>
+				<button class="btn btn-lg whitebtn  disabled" id="stoplistenbtn" onclick=""><i class="fas fa-microphone-slash"></i> Stop listening</button>
+				<p class="btn-note">** Note: Read the instructions given below before using the buttons **</p>
+		</div>
+		<div class="boxes">
+			<div class="row">
+				<div class="col-lg-6 col-md-12">
+					<span class="box-heading">Text:</span>
+					<!--<div class="voicetotextarea" id="voicetotextarea"></div>-->
+					<div class="codetextcontainer">
+						<textarea class="codetextarea" placeholder="Enter some code text" id="codetextbox" name="codetext" rows="4" style=""></textarea>
+					</div>
+				</div>
+				<div class="col-lg-6 col-md-12">
+					<span class="box-heading">Code:</span>
+					<div class="codebox" id="codebox"></div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md">
+					<span class="box-heading">Output:</span>
+					<div class="outputbox" id="outputbox"></div>
+				</div>
+			</div>
+		</div>
+		<div class="instructions">
+			<p class="instructions-text">1. click on speak button to start voice recognnition.</p>
+			<p class="instructions-text">2. click on clear text to clear all the recognized text.</p>
+			<p class="instructions-text">3. if you want to edit some text in recognized text, just edit it after that click edit text to apply changes.</p>
+			<p class="instructions-text">Note: if you added some text at end while editing please give a space at end and then hit edit text button.</p>
+			<p class="instructions-text">4. click on execute button to execute the code and see the output.</p>
+		</div>
+		<script type="text/javascript">
+		$(document).ready(function(){
+			$('#codetextbox').autosize();
+			});
+		</script>
+
+
+		<!-- voicetotext js -->
+		<script type="text/javascript">
+			var r = document.getElementById('codetextbox');
+
+			function startConverting () {
+				if('webkitSpeechRecognition' in window){
+					var speechRecognizer = new webkitSpeechRecognition();
+					speechRecognizer.continuous = true;
+					speechRecognizer.interimResults = true;
+					speechRecognizer.lang = 'en-US';
+					speechRecognizer.start();
+
+					var finalTranscripts = r.value;
+
+					speechRecognizer.onresult = function(event){
+						var interimTranscripts = '';
+						for(var i = event.resultIndex; i < event.results.length; i++){
+							var transcript = event.results[i][0].transcript;
+							transcript.replace("\n", "<br>");
+							transcript.replace("new line", "<br>");
+							if(event.results[i].isFinal){
+								finalTranscripts += transcript;
+							}else{
+								interimTranscripts += transcript;
+							}
+						}
+
+						r.value = finalTranscripts + interimTranscripts; //'<span style="color:red">' + interimTranscripts + '</span>';
+					};
+					speechRecognizer.onerror = function (event) {
+					};
+				}else{
+					r.innerHTML = 'Your browser is not supported. If google chrome, please upgrade!';
+				}
+			}
+
+			function cleartext(){
+				r.value = ""
+			}
+
+			function edittext(){
+				speechRecognizer.stop();
+				finalTranscripts = r.value;
+			}
+			function stoplisten(){
+				speechRecognizer.stop();
+			}
+		</script>
+	</body>
+</html>
