@@ -54,16 +54,17 @@ body{
   font-size: 1rem;
   padding-left: 1%;
 }
-.codetextcontainer{
+.codecontainer{
   margin-right: 2.5%;
 }
-#codetextbox {
+#codebox {
+  position: relative;
   height: 480px;
   width: 100%;
   margin: 1% 1%;
 	overflow:hidden;
-	background-color:#FFF;
-	color:#222;
+	/* background-color:#FFF; */
+	/* color:#222; */
 	font-family:Courier, monospace;
 	font-weight:normal;
 	font-size:18px;
@@ -81,27 +82,6 @@ body{
 	border-bottom:1px solid #FFF;
 }
 
-.voicetotextarea{
-  height: 500px;
-  padding: 1% 1%;
-  margin: 1% 1%;
-  font-size: 14px;
-  line-height: 25px;
-  color: white;
-  background: #202020;
-}
-
-.codebox{
-  height: 480px;
-  padding: 1% 1%;
-  margin: 1% 1%;
-  font-size: 14px;
-  line-height: 25px;
-  color: white;
-  background: #202020;
-  border-radius:12px;
-}
-
 .outputbox{
   height: 480px;
   padding: 1% 1%;
@@ -111,11 +91,20 @@ body{
   color: white;
   background: #202020;
   border-radius:12px;
+  overflow-y: scroll;
 }
+
+#testcodebox{
+  position: relative;
+  width: 500px;
+  height: 400px;
+}
+
 .instructions{
   margin: 1% 1%;
   padding: 1% 1%;
 }
+
 @media screen and (max-width: 991px) {
 
   .opt-buttons{
