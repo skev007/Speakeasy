@@ -6,15 +6,12 @@ var r = document.getElementById('codebox');
 var genCode = "";
 
 
-//const videoElement = document.querySelector('video');
 const audioSelect = document.querySelector('select#audioSource');
-//const videoSelect = document.querySelector('select#videoSource');
 
 navigator.mediaDevices.enumerateDevices()
 .then(gotDevices).then(getStream).then(console.log("audio devices listed")).catch(handleError);
 
 audioSelect.onchange = getStream;
-//videoSelect.onchange = getStream;
 
 function gotDevices(deviceInfos) {
 for (let i = 0; i !== deviceInfos.length; ++i) {
@@ -50,7 +47,6 @@ navigator.mediaDevices.getUserMedia(constraints).
 
 function gotStream(stream) {
 window.stream = stream; // make stream available to console
-//videoElement.srcObject = stream;
 }
 
 function handleError(error) {
@@ -106,15 +102,6 @@ function startConverting () {
 }
 
 function generator(text){
-    // $.post("/genCode",{codetext: text},function(data,status){
-    //     if(data=="enter"){
-    //         sendkeys();
-    //     }
-    //     else if(data!="could not interpret"){
-    //         genCode += data;
-    //         r.value = genCode;
-    //     }
-    // });
     socket.emit('genCode', text);
 }
 const controlscodemap ={
@@ -160,18 +147,16 @@ socket.on("codeoutput", (output) => {
     outputbox.innerHTML +="<br>" + output.replaceAll("\n","<br>");
 })
 
-function cleartext(){
+function cleartext(){ //incomplete
     r.value = "";
     finalTranscripts = r.value;
     genCode = r.value;
 }
 
 function edittext(){
-    speechRecognizer.stop();
-    finalTranscripts = r.value;
+    speechRecognizer.stop(); //incomplete
 }
 
 function abortlisten(){
-    // speechRecognizer.abort();
-    generator(editor.getValue());
+    speechRecognizer.abort();
 }
