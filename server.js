@@ -21,37 +21,6 @@ app.get("/", function(req, res){
   res.sendFile(__dirname + "/index.html");
 });
 
-// app.post("/genCode", function(req, res){
-//   var recText = req.body.codetext;
-//   if(recText=="if else statement" || recText.includes("if statement") || recText.includes("else statement")){
-//   	var genText="if condition:\n\t\nelse:\n\t\n";
-//   	res.send(genText);
-//   }
-//   else if(recText=="for statement" || recText.includes("or statement")){
-//     var genText="for variable in range():\n\t\n";
-//   	res.send(genText);
-//   }
-//   else if(recText=="enter" || recText.includes("enter")){
-//     genText="enter";
-//     res.send(genText);
-//   	//res.send(driver.findElement(By.name("code")).sendKeys(Key.RETURN));
-//   }
-//   else if(recText.includes("run command")){
-//     exec('dir', (error, stdout, stderr) => {
-//       if (error) {
-//         console.error(`exec error: ${error}`);
-//         return;
-//       }
-//       console.log(`stdout: ${stdout}`);
-//       console.error(`stderr: ${stderr}`);
-//     });
-//   }
-//   else{
-//     res.send("could not interpret");
-//   }
-
-// });
-
 io.on('connection', socket => {
   console.log('a user connected');
 
@@ -67,18 +36,23 @@ io.on('connection', socket => {
       console.log('A file saved!');
     });
     console.log("starting execution...")
-    const python = execFile('python', [`${__dirname + '/temp/test.py'}`]);
-    // collect data from script
-    python.stdout.on('data', function (data) {
-      socket.emit("codeoutput", data.toString());
-    });
-    python.on('close', (code) => {
-      console.log(`child process finished and closed all stdio with code ${code}`);
-    });
-    python.stderr.on('data', err => {
-      console.log("an error occurred while execution.\n");
-      socket.emit('codeoutput', err)
-    });
+    try{
+      const python = execFile('python', [`${__dirname + '/temp/test.py'}`]);
+      // collect data from script
+      python.stdout.on('data', function (data) {
+        socket.emit("codeoutput", data.toString());
+      });
+      python.on('close', (code) => {
+        console.log(`child process finished and closed all stdio with code ${code}`);
+      });
+      python.stderr.on('data', err => {
+        console.log("an error occurred while execution.\n");
+        socket.emit('codeoutput', err)
+      });
+    }catch(e){
+      console.log("error:",e)
+    }
+    
   });
 
   socket.on('disconnect', () => {
@@ -92,6 +66,7 @@ const statements = {
   "create else condition":["else:","\n"],
   "create a for loop":["for __variable_name__ in range(_lowerlimit_,_upperlimit_):","\n"],
   "create a while loop":["while(_condition_):","\n"],
+  "create a function":["def _function_name_():","\n"],
   "print statement":["print(\"\")"],
   "tab":["tab"],
   "remove indent":["untab"],
@@ -101,28 +76,56 @@ const statements = {
   "left":["go left"],
   "right":["go right"],
   "select":["select"],
-  "deselect":["deselect"],
+  "clear selection":["deselect"],
   "delete":["delete"],
   "undo":["undo"],
   "redo":["redo"]
 }
 
-const generateCode = (text) =>{
-  if(text.indexOf(" ") == 0){
-    var text = text.slice(1,text.length);
-  }
-  if(text.includes('write this')){
-    text = text.replace('write this','');
-    return [text];
-  }else{
-    var generatedCode;
-    console.log("|"+text+"| stt received");
-    if(text!="" && statements[text]){
-      generatedCode = statements[text];
+const stringReplacers = {
+  "dot":".",
+  "underscore":"_",
+  "colon":":",
+  "round":"()",
+  "brackets":"[]",
+  "curly":"{}",
+  "equals":"=",
+  "quotes":"\'\'",
+  "not":"!",
+  "plus":"+",
+  "minus":"-",
+  "multiply":"*",
+  "divide":"/",
+  "space":" ",
+  "comma":","
+}
+
+const stringFormatter =(string) => {
+  string = string.trim().toLowerCase();
+  if(string!=""){
+    if(statements[string]){
+      let generatedCode = statements[string];
       return generatedCode;
+    }else if(string.indexOf("insert")==0){
+      let formattedString = string.split(" "); 
+      if(formattedString[0]=== "insert"){
+        formattedString.shift()
+      }
+      for(let i = 0;i<formattedString.length;i++){
+        if(stringReplacers[formattedString[i]]){
+          formattedString[i] = stringReplacers[formattedString[i]]
+        }
+      }
+      formattedString = formattedString.join("");
+      return [formattedString]
     }else{
       return ["unidentified"];
     }
   }
-  
+  return ["unidentified"];
+}
+
+const generateCode = (text) =>{
+    let stringCode = stringFormatter(text);
+    return stringCode;
 }

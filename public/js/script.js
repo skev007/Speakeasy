@@ -58,7 +58,7 @@ function handleError(error) {
 }
 
 
-var commandsGrammar = [ 'for loop' , 'if condition' , 'else condition', 'while loop', 'up', 'down', 'left', 'right', 'undo' , 'redo' , 'delete' , 'tab' , 'untab' , 'select' , 'deselect' , 'new line', 'create', 'a', 'loop', 'go'];
+var commandsGrammar = [ 'for loop' , 'if condition' , 'else condition', 'while loop', 'up', 'down', 'left', 'right', 'undo' , 'redo' , 'delete' , 'tab' , 'untab' , 'select' , 'deselect' , 'new line', 'create', 'a', 'loop', 'go','insert'];
 var grammar = '#JSGF V1.0; grammar commands; public <commands> = ' + commandsGrammar.join(' | ') + ' ;'
 
 function startConverting () {
@@ -71,7 +71,7 @@ function startConverting () {
         var speechRecognitionList = new webkitSpeechGrammarList();
         speechRecognitionList.addFromString(grammar, 1);
         speechRecognizer.grammars = speechRecognitionList;
-        speechRecognizer.continuous = true;
+        speechRecognizer.continuous = false;
         speechRecognizer.interimResults = true;
         speechRecognizer.maxAlternatives = 10;
         speechRecognizer.lang = 'en-IN';
